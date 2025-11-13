@@ -13,13 +13,13 @@ ACTIONS_PATH = "actions.json"
 SETTINGS_PATH = "settings.json"
 LOGS_PATH = "logs.txt"
 
-CHECK_TIMES = [(9, 0), (13, 0), (16, 0)] # Horas fijas Argentina
+CHECK_TIMES = [(9, 0), (13, 0), (16, 0)] # Horarios AR
 
 robot_running = True
 
 
 # ============================================================
-# UTILIDADES DE ARCHIVO
+# UTILIDADES JSON / LOGS
 # ============================================================
 
 def read_json(path):
@@ -45,8 +45,8 @@ def save_log(text):
 
 @app.route("/api/actions", methods=["GET"])
 def api_get_actions():
-    data = read_json(ACTIONS_PATH)
-    return jsonify(data)
+    return jsonify(read_json(ACTIONS_PATH))
+
 
 @app.route("/api/add", methods=["POST"])
 def api_add_action():
@@ -56,38 +56,33 @@ def api_add_action():
     down = float(req.get("down"))
 
     data = read_json(ACTIONS_PATH)
-    data[symbol] = {
-        "up": up,
-        "down": down,
-        "active": True
-    }
+    data[symbol] = {"up": up, "down": down, "active": True}
     write_json(ACTIONS_PATH, data)
 
     save_log(f"Añadida acción {symbol} (up={up}, down={down})")
     return jsonify({"ok": True})
 
+
 @app.route("/api/update", methods=["POST"])
 def api_update_action():
     req = request.json
     symbol = req.get("symbol")
-    up = req.get("up")
-    down = req.get("down")
-    active = req.get("active")
 
     data = read_json(ACTIONS_PATH)
     if symbol not in data:
         return jsonify({"error": "No existe"}), 404
 
-    if up is not None:
-        data[symbol]["up"] = float(up)
-    if down is not None:
-        data[symbol]["down"] = float(down)
-    if active is not None:
-        data[symbol]["active"] = bool(active)
+    if req.get("up") is not None:
+        data[symbol]["up"] = float(req.get("up"))
+    if req.get("down") is not None:
+        data[symbol]["down"] = float(req.get("down"))
+    if req.get("active") is not None:
+        data[symbol]["active"] = bool(req.get("active"))
 
     write_json(ACTIONS_PATH, data)
     save_log(f"Actualizada acción {symbol}")
     return jsonify({"ok": True})
+
 
 @app.route("/api/delete", methods=["POST"])
 def api_delete_action():
@@ -111,18 +106,17 @@ def api_delete_action():
 def api_get_settings():
     return jsonify(read_json(SETTINGS_PATH))
 
+
 @app.route("/api/settings", methods=["POST"])
 def api_save_settings():
     req = request.json
-    token = req.get("token")
-    chat_id = req.get("chat_id")
 
     data = {
-        "token": token,
-        "chat_id": chat_id
+        "token": req.get("token"),
+        "chat_id": req.get("chat_id")
     }
     write_json(SETTINGS_PATH, data)
-    save_log("Actualizados Telegram token/chat_id")
+    save_log("Actualizados token/chat_id Telegram")
 
     return jsonify({"ok": True})
 
@@ -141,21 +135,41 @@ def api_get_logs():
 
 
 # ============================================================
+# API – TEST TELEGRAM
+# ============================================================
+
+@app.route("/api/test-tg", methods=["POST"])
+def api_test_tg():
+    settings = read_json(SETTINGS_PATH)
+    token = settings.get("token")
+    chat_id = settings.get("chat_id")
+
+    if not token or not chat_id:
+        return jsonify({"error": "Falta token o chat_id"}), 400
+
+    msg = "🚀 Test OK – Tu bot está funcionando."
+    enviar_telegram(token, chat_id, msg)
+    save_log("Test Telegram enviado")
+
+    return jsonify({"ok": True})
+
+
+# ============================================================
 # TELEGRAM
 # ============================================================
 
 def enviar_telegram(token, chat_id, mensaje):
-    if not token or not chat_id:
-        return
     try:
         url = f"https://api.telegram.org/bot{token}/sendMessage"
-        requests.post(url, data={"chat_id": chat_id, "text": mensaje}, timeout=10)
-    except:
-        pass
+        r = requests.post(url, data={"chat_id": chat_id, "text": mensaje}, timeout=10)
+        if r.status_code != 200:
+            save_log(f"Error Telegram: {r.text}")
+    except Exception as e:
+        save_log(f"Excepción Telegram: {str(e)}")
 
 
 # ============================================================
-# ROBOT 24/7
+# ROBOT – CHEQUEO 24/7
 # ============================================================
 
 def robot_loop():
@@ -181,7 +195,7 @@ def robot_loop():
 
             acciones = read_json(ACTIONS_PATH)
 
-            save_log(f"Chequeo programado → {now_ar.strftime('%H:%M')}")
+            save_log(f"Chequeo → {now_ar.strftime('%H:%M')}")
 
             for symbol, info in acciones.items():
                 if not info["active"]:
@@ -191,26 +205,26 @@ def robot_loop():
                     data = yf.Ticker(symbol).history(period="1d", interval="1m")
                     precio = float(data["Close"].iloc[-1])
                 except:
-                    save_log(f"Error obteniendo precio de {symbol}")
+                    save_log(f"Error precio {symbol}")
                     continue
 
                 up_level = info["up"]
                 down_level = info["down"]
 
                 if precio >= up_level:
-                    msg = f"📈 {symbol} está por ENCIMA de {up_level} → {precio:.2f}"
+                    msg = f"📈 {symbol} arriba de {up_level} → {precio:.2f}"
                     enviar_telegram(token, chat_id, msg)
                     save_log(msg)
 
                 if precio <= down_level:
-                    msg = f"📉 {symbol} está por DEBAJO de {down_level} → {precio:.2f}"
+                    msg = f"📉 {symbol} abajo de {down_level} → {precio:.2f}"
                     enviar_telegram(token, chat_id, msg)
                     save_log(msg)
 
         time.sleep(30)
 
 
-# Iniciar robot en thread
+# Iniciar robot
 threading.Thread(target=robot_loop, daemon=True).start()
 
 
@@ -220,7 +234,7 @@ threading.Thread(target=robot_loop, daemon=True).start()
 
 @app.route("/")
 def index():
-    return "<h1>Servidor activo. El frontend está en /static/index.html</h1>"
+    return "<h1>Servidor activo. Frontend en /static/index.html</h1>"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
