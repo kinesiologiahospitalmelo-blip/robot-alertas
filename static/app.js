@@ -1,83 +1,111 @@
-const api = (endpoint, method="GET", data=null) => {
-    return fetch(endpoint, {
-        method: method,
-        headers: {"Content-Type": "application/json"},
-        body: data ? JSON.stringify(data) : null
-    }).then(r => r.json());
-};
-
-// ================= TABS =================
+// ============================
+// CAMBIO DE TABS
+// ============================
 document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.onclick = () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".tab").forEach(sec => sec.classList.remove("active"));
         document.getElementById(btn.dataset.tab).classList.add("active");
     };
 });
 
-// ================= ACCIONES =================
-function loadActions() {
-    api("/api/actions").then(data => {
-        let html = "";
-        for (let symbol in data) {
-            const info = data[symbol];
+// ============================
+// CARGAR ACCIONES
+// ============================
+function cargarAcciones() {
+    fetch("/api/actions")
+        .then(r => r.json())
+        .then(data => {
+            const box = document.getElementById("acciones-list");
+            box.innerHTML = "";
 
-            html += `
-            <div class="card">
-                <b>${symbol}</b> — Alza: ${info.up} · Baja: ${info.down}
-                <br>
-                Estado: <b>${info.active ? "ACTIVA" : "INACTIVA"}</b>
-                <br>
-                <button onclick="toggleAction('${symbol}', ${!info.active})">
-                    ${info.active ? "Desactivar" : "Activar"}
-                </button>
-                <button onclick="deleteAction('${symbol}')">Eliminar</button>
-            </div>
-            <hr>`;
-        }
-        document.getElementById("acciones-list").innerHTML = html;
-    });
+            Object.keys(data).forEach(symbol => {
+                const info = data[symbol];
+
+                box.innerHTML += `
+                    <div class="item">
+                        <b>${symbol}</b>
+                        &nbsp;|&nbsp; ⬆ ${info.up} &nbsp;|&nbsp; ⬇ ${info.down}
+                        &nbsp;|&nbsp; Activa: 
+                        <input type="checkbox" ${info.active ? "checked" : ""} 
+                            onchange="toggleAccion('${symbol}', this.checked)">
+                        <button onclick="borrarAccion('${symbol}')">❌</button>
+                    </div>
+                `;
+            });
+        });
 }
 
-function toggleAction(symbol, state) {
-    api("/api/update", "POST", {symbol: symbol, active: state}).then(loadActions);
-}
+cargarAcciones();
 
-function deleteAction(symbol) {
-    api("/api/delete", "POST", {symbol: symbol}).then(loadActions);
-}
-
+// ============================
+// AGREGAR ACCIÓN
+// ============================
 document.getElementById("btn-add").onclick = () => {
-    const s = document.getElementById("new-symbol").value.toUpperCase();
-    const u = document.getElementById("new-up").value;
-    const d = document.getElementById("new-down").value;
+    const symbol = document.getElementById("new-symbol").value;
+    const up = document.getElementById("new-up").value;
+    const down = document.getElementById("new-down").value;
 
-    api("/api/add", "POST", {symbol: s, up: u, down: d}).then(() => {
-        document.getElementById("new-symbol").value = "";
-        document.getElementById("new-up").value = "";
-        document.getElementById("new-down").value = "";
-        loadActions();
-    });
+    fetch("/api/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol, up, down })
+    }).then(() => cargarAcciones());
 };
 
-loadActions();
+// ============================
+// ACTIVAR / DESACTIVAR ACCIÓN
+// ============================
+function toggleAccion(symbol, active) {
+    fetch("/api/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol, active })
+    });
+}
 
-// ================= TELEGRAM =================
+// ============================
+// BORRAR ACCIÓN
+// ============================
+function borrarAccion(symbol) {
+    fetch("/api/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol })
+    }).then(() => cargarAcciones());
+}
+
+// ============================
+// TELEGRAM
+// ============================
 document.getElementById("btn-save-tg").onclick = () => {
     const token = document.getElementById("tg-token").value;
-    const chat = document.getElementById("tg-chat").value;
+    const chat_id = document.getElementById("tg-chat").value;
 
-    api("/api/settings", "POST", {token: token, chat_id: chat});
+    fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, chat_id })
+    }).then(() => alert("Guardado"));
 };
 
 document.getElementById("btn-test-tg").onclick = () => {
-    api("/api/settings").then(s => {
-        fetch(`https://api.telegram.org/bot${s.token}/sendMessage?chat_id=${s.chat_id}&text=Test desde Robot Alertas`);
-    });
+    fetch("/api/test-telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}"
+    })
+    .then(r => r.json())
+    .then(() => alert("Mensaje enviado a Telegram"))
+    .catch(() => alert("Error enviando mensaje"));
 };
 
-// ================= LOGS =================
+// ============================
+// LOGS
+// ============================
 document.getElementById("btn-refresh-logs").onclick = () => {
-    api("/api/logs").then(logs => {
-        document.getElementById("logs-box").textContent = logs.join("\n");
-    });
+    fetch("/api/logs")
+        .then(r => r.json())
+        .then(lines => {
+            document.getElementById("logs-box").textContent = lines.join("\n");
+        });
 };
