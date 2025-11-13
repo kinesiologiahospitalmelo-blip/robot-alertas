@@ -4,8 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot de Alertas</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- ===================== PWA CONFIG ===================== -->
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Theme color (barra superior en Android) -->
+    <meta name="theme-color" content="#222222">
+
+    <!-- Icons (PWA) -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+    <!-- Registrar el Service Worker -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker
+                .register("service-worker.js")
+                .then(() => console.log("ServiceWorker registrado"))
+                .catch(err => console.log("Error SW:", err));
+        }
+    </script>
+    <!-- ====================================================== -->
 </head>
+
 <body>
 
     <header>
@@ -28,8 +53,8 @@
 
         <h3>Agregar nueva acción</h3>
         <input id="new-symbol" placeholder="Ticker (ej: AAPL)" />
-        <input id="new-up" placeholder="Precio alza" type="number"/>
-        <input id="new-down" placeholder="Precio baja" type="number"/>
+        <input id="new-up" placeholder="Precio alza" type="number" />
+        <input id="new-down" placeholder="Precio baja" type="number" />
         <button id="btn-add">Agregar</button>
     </section>
 
