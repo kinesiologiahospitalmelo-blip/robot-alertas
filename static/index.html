@@ -5,69 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot de Alertas</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
 
-    <!-- MANIFEST PWA -->
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
 
-    <!-- Service Worker -->
+    <!-- Iconos reales -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+    <!-- Registrar Service Worker -->
     <script>
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("service-worker.js")
-            .then(() => console.log("SW registrado"))
-            .catch(e => console.log("SW ERROR", e));
+            navigator.serviceWorker
+                .register("service-worker.js")
+                .then(() => console.log("ServiceWorker registrado"))
+                .catch(err => console.error("Error SW:", err));
         }
     </script>
 </head>
 
 <body>
 
-<header>
-    <h1>Robot de Alertas</h1>
-    <nav>
-        <button class="tab-btn" data-tab="acciones">Acciones</button>
-        <button class="tab-btn" data-tab="telegram">Telegram</button>
-        <button class="tab-btn" data-tab="config">Configuración</button>
-        <button class="tab-btn" data-tab="logs">Logs</button>
-    </nav>
-</header>
+    <header>
+        <h1>Robot de Alertas</h1>
+        <nav>
+            <button class="tab-btn" data-tab="acciones">Acciones</button>
+            <button class="tab-btn" data-tab="telegram">Telegram</button>
+            <button class="tab-btn" data-tab="config">Configuración</button>
+            <button class="tab-btn" data-tab="logs">Logs</button>
+        </nav>
+    </header>
 
-<section id="acciones" class="tab active">
-    <h2>Acciones</h2>
-    <div id="acciones-list"></div>
-    <hr>
-    <h3>Agregar nueva acción</h3>
-    <input id="new-symbol" placeholder="Ticker (ej: AAPL)">
-    <input id="new-up" placeholder="Precio alza" type="number">
-    <input id="new-down" placeholder="Precio baja" type="number">
-    <button id="btn-add">Agregar</button>
-</section>
+    <!-- ACCIONES -->
+    <section id="acciones" class="tab active">
+        <h2>Acciones</h2>
+        <div id="acciones-list"></div>
 
-<section id="telegram" class="tab">
-    <h2>Telegram</h2>
+        <hr>
 
-    <label>Bot Token:</label>
-    <input id="tg-token">
+        <h3>Agregar nueva acción</h3>
+        <input id="new-symbol" placeholder="Ticker (ej: AAPL)" />
+        <input id="new-up" placeholder="Precio alza" type="number" />
+        <input id="new-down" placeholder="Precio baja" type="number" />
+        <button id="btn-add">Agregar</button>
+    </section>
 
-    <label>Chat ID:</label>
-    <input id="tg-chat">
+    <!-- TELEGRAM -->
+    <section id="telegram" class="tab">
+        <h2>Configuración de Telegram</h2>
+        <label>Bot Token:</label>
+        <input id="tg-token" placeholder="123456:ABCDEF" />
 
-    <button id="btn-save-tg">Guardar</button>
-    <button id="btn-test-tg">Probar Telegram</button>
-</section>
+        <label>Chat ID:</label>
+        <input id="tg-chat" placeholder="12345678" />
 
-<section id="config" class="tab">
-    <h2>Configuración general</h2>
-    <p>Horarios: 09:00 – 13:00 – 16:00</p>
-</section>
+        <button id="btn-save-tg">Guardar</button>
+        <button id="btn-test-tg">Enviar mensaje de prueba</button>
+    </section>
 
-<section id="logs" class="tab">
-    <h2>Logs</h2>
-    <button id="btn-refresh-logs">Actualizar</button>
-    <pre id="logs-box"></pre>
-</section>
+    <!-- CONFIG -->
+    <section id="config" class="tab">
+        <h2>Configuración general</h2>
+        <p><b>Horarios fijos:</b> 09:00, 13:00, 16:00 (hora Argentina)</p>
+        <p>Robot funcionando en Render en segundo plano.</p>
+    </section>
 
-<script src="app.js"></script>
+    <!-- LOGS -->
+    <section id="logs" class="tab">
+        <h2>Logs del servidor</h2>
+        <button id="btn-refresh-logs">Actualizar logs</button>
+        <pre id="logs-box"></pre>
+    </section>
+
+    <script src="app.js"></script>
 </body>
 </html>
