@@ -1,0 +1,50 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f2f2f2;
+}
+
+header {
+    background: #222;
+    padding: 15px;
+    color: #fff;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+nav button {
+    margin-right: 10px;
+    padding: 8px 12px;
+    background: #444;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+nav button:hover {
+    background: #666;
+}
+
+.tab {
+    display: none;
+    padding: 20px;
+}
+
+.tab.active {
+    display: block;
+}
+
+input {
+    width: 200px;
+    margin: 5px;
+    padding: 8px;
+}
+
+button {
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-top: 10px;
+}

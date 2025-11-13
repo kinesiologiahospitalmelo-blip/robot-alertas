@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot de Alertas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Robot de Alertas</h1>
+        <nav>
+            <button class="tab-btn" data-tab="acciones">Acciones</button>
+            <button class="tab-btn" data-tab="telegram">Telegram</button>
+            <button class="tab-btn" data-tab="config">Configuración</button>
+            <button class="tab-btn" data-tab="logs">Logs</button>
+        </nav>
+    </header>
+
+    <!-- =================== SECCIÓN ACCIONES =================== -->
+    <section id="acciones" class="tab active">
+        <h2>Acciones</h2>
+
+        <div id="acciones-list"></div>
+
+        <hr>
+
+        <h3>Agregar nueva acción</h3>
+        <input id="new-symbol" placeholder="Ticker (ej: AAPL)" />
+        <input id="new-up" placeholder="Precio alza" type="number"/>
+        <input id="new-down" placeholder="Precio baja" type="number"/>
+        <button id="btn-add">Agregar</button>
+    </section>
+
+    <!-- =================== SECCIÓN TELEGRAM =================== -->
+    <section id="telegram" class="tab">
+        <h2>Configuración de Telegram</h2>
+
+        <label>Bot Token:</label>
+        <input id="tg-token" placeholder="123456:ABCDEF"/>
+
+        <label>Chat ID:</label>
+        <input id="tg-chat" placeholder="12345678"/>
+
+        <button id="btn-save-tg">Guardar</button>
+        <button id="btn-test-tg">Enviar mensaje de prueba</button>
+    </section>
+
+    <!-- =================== SECCIÓN CONFIGURACIÓN =================== -->
+    <section id="config" class="tab">
+        <h2>Configuración general</h2>
+
+        <p><b>Horarios fijos:</b> 09:00, 13:00, 16:00 (hora Argentina)</p>
+        <p>Robot funcionando en Render en segundo plano.</p>
+    </section>
+
+    <!-- =================== SECCIÓN LOGS =================== -->
+    <section id="logs" class="tab">
+        <h2>Logs del servidor</h2>
+        <button id="btn-refresh-logs">Actualizar logs</button>
+        <pre id="logs-box"></pre>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
