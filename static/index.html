@@ -5,24 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot de Alertas</title>
 
-    <!-- ===================== ESTILOS ===================== -->
+    <!-- CSS -->
     <link rel="stylesheet" href="/static/styles.css">
 
-    <!-- ===================== PWA CONFIG ===================== -->
+    <!-- PWA -->
     <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#222222">
-
-    <!-- Iconos embebidos (no requiere archivos adicionales) -->
-    <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAQAAAD41aSMAAAA...">
-    <link rel="icon" type="image/png" sizes="512x512" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAQAAAD0eNT6AAA...">
+    <meta name="theme-color" content="#00e5b0">
 
     <!-- Service Worker -->
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker
-                .register("/static/service-worker.js")
-                .then(() => console.log("ServiceWorker registrado correctamente"))
-                .catch(err => console.error("Error ServiceWorker:", err));
+                .register("/static/service-worker.js?v=5")
+                .then(() => console.log("ServiceWorker registrado"))
+                .catch(err => console.log("Error SW:", err));
         }
     </script>
 </head>
@@ -39,7 +35,7 @@
         </nav>
     </header>
 
-    <!-- =================== SECCIÓN ACCIONES =================== -->
+    <!-- =================== ACCIONES =================== -->
     <section id="acciones" class="tab active">
         <h2>Acciones</h2>
 
@@ -48,35 +44,34 @@
         <hr>
 
         <h3>Agregar nueva acción</h3>
-        <input id="new-symbol" placeholder="Ticker (ej: AAPL)" />
-        <input id="new-up" placeholder="Precio alza" type="number" />
-        <input id="new-down" placeholder="Precio baja" type="number" />
+        <input id="new-symbol" placeholder="Ticker (ej: AAPL)">
+        <input id="new-up" placeholder="Precio alza" type="number">
+        <input id="new-down" placeholder="Precio baja" type="number">
         <button id="btn-add">Agregar</button>
     </section>
 
-    <!-- =================== SECCIÓN TELEGRAM =================== -->
+    <!-- =================== TELEGRAM =================== -->
     <section id="telegram" class="tab">
         <h2>Configuración de Telegram</h2>
 
         <label>Bot Token:</label>
-        <input id="tg-token" placeholder="123456:ABCDEF"/>
+        <input id="tg-token" placeholder="TOKEN">
 
         <label>Chat ID:</label>
-        <input id="tg-chat" placeholder="12345678"/>
+        <input id="tg-chat" placeholder="12345678">
 
         <button id="btn-save-tg">Guardar</button>
         <button id="btn-test-tg">Enviar mensaje de prueba</button>
     </section>
 
-    <!-- =================== SECCIÓN CONFIGURACIÓN =================== -->
+    <!-- =================== CONFIGURACIÓN =================== -->
     <section id="config" class="tab">
         <h2>Configuración general</h2>
-
-        <p><b>Horarios fijos:</b> 09:00, 13:00, 16:00 (hora Argentina)</p>
-        <p>Robot funcionando en Render en segundo plano.</p>
+        <p><b>Horarios fijos:</b> 09:00, 13:00, 16:00 (Argentina)</p>
+        <p>Robot funcionando en Render 24/7.</p>
     </section>
 
-    <!-- =================== SECCIÓN LOGS =================== -->
+    <!-- =================== LOGS =================== -->
     <section id="logs" class="tab">
         <h2>Logs del servidor</h2>
         <button id="btn-refresh-logs">Actualizar logs</button>
