@@ -1,10 +1,9 @@
 self.addEventListener("install", e => {
-    console.log("SW instalado");
     self.skipWaiting();
 });
 
 self.addEventListener("activate", e => {
-    console.log("SW activado");
+    console.log("SW activo");
 });
 
-self.addEventListener("fetch", () => {});
+self.addEventListener("fetch", event => {});
